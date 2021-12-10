@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cdb47ca-23f0-4ddf-9658-c5b85a9aa360" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/interfaceTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/learning.go" afterDir="false" />
+    <list default="true" id="4cdb47ca-23f0-4ddf-9658-c5b85a9aa360" name="Changes" comment="commit">
+      <change afterPath="$PROJECT_DIR$/dp.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/functionTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/newPackage/packageTest.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hello.go" beforeDir="false" afterPath="$PROJECT_DIR$/hello.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,6 +99,10 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
