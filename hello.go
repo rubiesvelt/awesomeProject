@@ -1,96 +1,44 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
+import "awesomeProject/goLearning"
 
 func main() {
-	s := []int{7, 2, 8, -9, 4, 0}
-
-	c := make(chan int)
-
-	go sum(s[len(s)/2:], c) // 后三个的和
-	// time.Sleep(100*time.Millisecond)
-	go sum(s[:len(s)/2], c) // 前三个的和
-
-	x, y := <-c, <-c // 从通道 c 中接收
-
-	e := RPCError{}
-	e.Error()
-
-	fmt.Println(x, y, x+y)
-
-	type Test struct{}
-	v := Test{}
-	Print(v)
+	fmt.Println()
+	goLearning.ConcurrentTest()
 }
 
-func Print(v interface{}) {
-	println(v)
-}
+// 容器
+// Map, Set, Stack, Queue, Deque, List
+// Set, SortedSet, TreeSet
+// List, list.sort(), Comparator
 
-type throwShit interface {
-	throw() string
-}
+/**
+5935. 适合打劫银行的日子
 
-type RPCError struct { // RPCError实现了error接口
-	Code    int64
-	Message string
-}
+security = [5,3,3,3,5,6,2], time = 2
+-> [2,3]
 
-func (e *RPCError) Error() string { // 意思是 此方法属于 RPCError 结构体
-	return fmt.Sprintf("%s, code=%d", e.Message, e.Code)
-}
-
-func (e *RPCError) throw() string {
-	return "shit was threw"
-}
-
-func fibonacci(n int, c chan int) {
-	x, y := 0, 1
-	for i := 0; i < n; i++ {
-		c <- x
-		x, y = y, x+y
-	}
-	close(c)
-}
-
-func sum(s []int, c chan int) {
-	sum := 0
-	for _, v := range s {
-		sum += v
-	}
-	c <- sum // 把 sum 发送到通道 c
-}
-
-/*
- * 343. 整数拆分
- */
-func integerBreak(n int) int {
-	f := make([]int, n+1) // 创建切片
-	for i := 1; i <= n; i++ {
-		for j := 1; j < i; j++ {
-			f[i] = max(f[i], max((i-j)*f[j], (i-j)*j))
+*/
+func goodDaysToRobBank(security []int, time int) []int {
+	n := len(security)
+	left := make([]int, n) // 左边有几个大于等于 i 这个且递减的
+	for i := 1; i < n; i++ {
+		if security[i-1] >= security[i] {
+			left[i] = left[i-1] + 1
 		}
 	}
-	return f[n]
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
+	right := make([]int, n)
+	for i := n - 2; i >= 0; i-- {
+		if security[i+1] >= security[i] {
+			right[i] = right[i+1] + 1
+		}
 	}
-	return b
-}
-
-func learn() {
-	var a, b int
-	var c string
-	a, b, c = 5, 7, "abc" // 变量 a，b 和 c 都已经被声明，否则的话应该这样使用：a, b, c := 5, 7, "abc"
-	fmt.Println(a, b, c)
-}
-
-func numbers() (int, int, string) {
-	a, b, c := 1, 2, "str"
-	return a, b, c
+	var ans []int // 定义不限大小的空数组
+	for i := 0; i < n; i++ {
+		if left[i] >= time && right[i] >= time {
+			ans = append(ans, i)
+		}
+	}
+	return ans
 }

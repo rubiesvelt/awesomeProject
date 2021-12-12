@@ -1,6 +1,11 @@
-package main
+package goLearning
 
 import "fmt"
+
+// Print eface
+func Print(v interface{}) {
+	println(v)
+}
 
 type Duck interface {
 	Quack()
@@ -27,4 +32,22 @@ func QuackTest() {
 	*/
 	var z Duck = &Cat{}
 	z.Quack()
+}
+
+// 另一个 interface test
+type throwShit interface {
+	throw() string
+}
+
+type RPCError struct { // RPCError实现了error接口
+	Code    int64
+	Message string
+}
+
+func (e *RPCError) Error() string { // 意思是 此方法属于 RPCError 结构体
+	return fmt.Sprintf("%s, code=%d", e.Message, e.Code)
+}
+
+func (e *RPCError) throw() string {
+	return "shit was threw"
 }

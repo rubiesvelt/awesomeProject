@@ -5,10 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4cdb47ca-23f0-4ddf-9658-c5b85a9aa360" name="Changes" comment="commit">
-      <change afterPath="$PROJECT_DIR$/dp.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/functionTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/newPackage/packageTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/arrayTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/concurrentTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/loopTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/mapTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/operatorTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/pointerTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/structTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/goLearning/varTest.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dp.go" beforeDir="false" afterPath="$PROJECT_DIR$/dp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionTest.go" beforeDir="false" afterPath="$PROJECT_DIR$/goLearning/functionTest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hello.go" beforeDir="false" afterPath="$PROJECT_DIR$/hello.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaceTest.go" beforeDir="false" afterPath="$PROJECT_DIR$/goLearning/interfaceTest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/learning.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/newPackage/packageTest.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +37,14 @@
   <component name="GOROOT" url="file://$USER_HOME$/sdk/go1.17.4" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/sdk/go1.17.4/src/builtin/builtin.go" root0="SKIP_INSPECTION" />
@@ -48,6 +67,13 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/goLearning" />
+      <recent name="$PROJECT_DIR$/leetCode" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">

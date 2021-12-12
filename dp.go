@@ -65,3 +65,23 @@ func change(amount int, coins []int) int {
 	}
 	return f[amount]
 }
+
+/*
+ * 343. 整数拆分
+ */
+func integerBreak(n int) int {
+	f := make([]int, n+1) // 创建切片
+	for i := 1; i <= n; i++ {
+		for j := 1; j < i; j++ {
+			f[i] = max(f[i], max((i-j)*f[j], (i-j)*j))
+		}
+	}
+	return f[n]
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
