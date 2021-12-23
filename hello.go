@@ -7,20 +7,22 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/golang/glog"
 	"sort"
+	"strings"
 	"time"
 
 	_ "gorm.io/driver/clickhouse"
 )
 
-// "SELECT *\nFROM \n(\n    SELECT\n        '所有用户' AS compare_user,\n        platid,\n\t\tdate_trunc('day', toDateTime(dteventtime)) gtime,\n        count(distinct multiIf(event = 'MoneyFlow', vopenid, NULL)) AS MoneyFlow_cnt,\n        count(distinct multiIf(event = 'ItemFlow', vopenid, NULL)) AS item_count\n    FROM clickhouse_441386_all\n    WHERE (dteventtime >= '{{begintime}}') AND (dteventtime < '{{endtime}}') AND (event IN ('MoneyFlow', 'ItemFlow'))\n    GROUP BY platid,date_trunc('day', toDateTime(dteventtime))\n    UNION ALL\n    SELECT\n        'izoneareaid=2009用户' AS compare_user,\n        platid,\n\t\tdate_trunc('day', toDateTime(dteventtime)) gtime,\n        count(distinct multiIf(event = 'MoneyFlow', vopenid, NULL)) AS MoneyFlow_cnt,\n        count(distinct multiIf(event = 'ItemFlow', vopenid, NULL)) AS item_count\n    FROM clickhouse_441386_all\n    WHERE (dteventtime >= '{{begintime}}') AND (dteventtime < '{{endtime}}') AND (izoneareaid = '2009') AND (event IN ('MoneyFlow', 'ItemFlow'))\n    GROUP BY platid,date_trunc('day', toDateTime(dteventtime))\n)\nORDER BY\n    platid ASC,\n    compare_user ASC"
-// "SELECT\n        '所有用户' AS compare_user,\n        date_trunc('day', toDateTime(t1.dteventtime)) AS gtime,\n        t2.ilevel,\n        max(multiIf(t1.event = 'PlayerLogin', t1.exp6, NULL)) AS PlayerLoginmNum,\n        max(multiIf(t1.event = 'PlayerRegister', t1.exp6, NULL)) AS PlayerRegistermNum,\n        count(distinct multiIf(t1.event = 'PlayerLogin', t1.vopenid, NULL)) AS usernum\n    FROM clickhouse_441386_all AS t1    \n    INNER JOIN\n   (\n        select ilevel,vopenid from clickhouse_441372_all AS x where platid=255\n    ) t2 \n    ON t1.vopenid=t2.vopenid\n    WHERE (t1.dteventtime > '{{begintime}}') AND (t1.dteventtime < '{{endtime}}') AND (t1.event IN ('PlayerLogin', 'PlayerRegister')) and t1.vopenid in \n        (\n       select vopenid from clickhouse_441372_all AS x where ilevel>20 and platid=255\n        ) \n        and t1.vopenid in (select vopenid from clickhouse_441372_all AS x where ilevel=54 and platid=255) and toInt64(t1.exp6)>200\n    GROUP BY\n        t2.ilevel,\n        gtime  \n    SETTINGS max_memory_usage = 11000000000, distributed_product_mode = 'local'\n        union all \n        SELECT\n        'cptest' AS compare_user,\n        date_trunc('day', toDateTime(t1.dteventtime)) AS gtime,\n        t2.ilevel,\n        max(multiIf(t1.event = 'PlayerLogin', t1.exp6, NULL)) AS PlayerLoginmNum,\n        max(multiIf(t1.event = 'PlayerRegister', t1.exp6, NULL)) AS PlayerRegistermNum,\n        count(distinct multiIf(t1.event = 'PlayerLogin', t1.vopenid, NULL)) AS usernum\n    FROM clickhouse_441386_all AS t1    \n    INNER JOIN\n   (\n        select ilevel,vopenid from clickhouse_441372_all AS x where platid=255\n    ) t2 \n    ON t1.vopenid=t2.vopenid\n    WHERE (t1.dteventtime > '{{begintime}}') AND (t1.dteventtime < '{{endtime}}') AND (t1.event IN ('PlayerLogin', 'PlayerRegister')) and t1.vopenid in \n        (\n       select vopenid from clickhouse_441372_all AS x where ilevel>20 and platid=255\n        ) \n        and t1.vopenid in (select vopenid from clickhouse_441372_all AS x where ilevel=54 and platid=255) and toInt64(t1.exp6)>100\n    GROUP BY\n        t2.ilevel,\n        gtime  \n    SETTINGS max_memory_usage = 11000000000, distributed_product_mode = 'local'"
 var (
-	ip          = flag.String("ip", "clickhouse.dengta-test.cdp.db.", "")
+	ip          = flag.String("ip", "", "")
+	ips         = flag.String("ips", "", "")
 	port        = flag.Int("port", 9000, "")
 	user        = flag.String("user", "presto", "")
 	password    = flag.String("password", "qazpresto#2021", "")
 	concurrency = flag.Int("concurrency", 1, "")
 	singleQuery = flag.Bool("singleQuery", false, "")
+	beginTime   = flag.String("beginTime", "2021-11-14 00:00:00", "")
+	endTime     = flag.String("endTime", "2021-11-21 00:00:00", "")
 
 	query = flag.String("q", "show databases", "")
 	sql1  = flag.String("q1", "", "")
@@ -35,10 +37,13 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("ip", *ip)
+	fmt.Println("ips", *ips)
 	fmt.Println("port", *port)
 	fmt.Println("user", *user)
 	fmt.Println("password", *password)
 	fmt.Println("concurrency", *concurrency)
+	fmt.Println("beginTime", *beginTime)
+	fmt.Println("endTime", *endTime)
 
 	sqls := []string{
 		*sql1, *sql2, *sql3, *sql4, *sql5, *sql6,
@@ -49,6 +54,7 @@ func main() {
 		if u == "" {
 			continue
 		}
+		replaceQueryTime(&u, beginTime, endTime)
 		queries = append(queries, u)
 		fmt.Println("sql: ", u)
 	}
@@ -63,6 +69,7 @@ func main() {
 	fmt.Println("cluster connected")
 
 	if *singleQuery {
+		replaceQueryTime(query, beginTime, endTime)
 		fmt.Println("execute single query: ", *query)
 		ret, err := Query(db, *query)
 		if err != nil {
@@ -74,37 +81,116 @@ func main() {
 		return
 	}
 
-	c := make(chan int)
+	c := make(chan QueryResult)
 
 	start := time.Now()
 	for i := 0; i < *concurrency; i++ {
 		fmt.Println("query ", i, " started")
 		go ConcurrentQuery(db, queries[i%len(queries)], c)
 	}
-	success := 0
-	failed := 0
+
+	res := make([]QueryResult, 0)
+
 	for i := 0; i < *concurrency; i++ {
 		x := <-c
-		if x == 1 {
-			failed++
-		} else {
-			success++
-		}
+		res = append(res, x)
 	}
 	elapsed := time.Since(start)
+	summary := makeSummary(res)
+
 	fmt.Println("执行完成")
-	fmt.Println("总计", *concurrency, "成功：", success, "失败：", failed)
-	fmt.Println("耗时：", elapsed)
+	fmt.Println("开始时间: ", *beginTime)
+	fmt.Println("结束时间: ", *endTime)
+	fmt.Println("总计: ", summary.total, "成功: ", summary.successNum, "失败: ", summary.failedNum)
+	fmt.Println("耗时: ", elapsed)
+	fmt.Println("avg: ", summary.avgSuccess)
+	fmt.Println("tp50: ", summary.tp50Success)
+	fmt.Println("tp90: ", summary.tp90Success)
+	fmt.Println("detail: ")
+	for _, u := range summary.successDetail {
+		fmt.Println(u)
+	}
 }
 
-func ConcurrentQuery(db *sql.DB, query string, c chan int) {
+type Summary struct {
+	total         int
+	successNum    int
+	failedNum     int
+	avgSuccess    int64
+	tp50Success   int64
+	tp90Success   int64
+	successDetail []int64
+}
+
+func makeSummary(res []QueryResult) Summary {
+
+	succ := make([]int64, 0)
+	fail := make([]int64, 0)
+
+	var totalCost int64
+	totalCost = 0
+	for _, u := range res {
+		if u.status == 0 {
+			t := u.elapsed.Milliseconds()
+			totalCost += t
+			succ = append(succ, t)
+			continue
+		}
+		fail = append(fail, u.elapsed.Milliseconds())
+	}
+	sort.Slice(succ, func(i, j int) bool { return succ[i] < succ[j] })
+
+	if len(succ) == 0 {
+		return Summary{failedNum: len(fail)}
+	}
+	total := len(res)
+	successNum := len(succ)
+	failedNum := len(fail)
+	avgSuccess := totalCost / int64(successNum)
+	tp50Success := succ[successNum/2]
+	tp90Success := succ[successNum*9/10]
+
+	summary := Summary{
+		total:         total,
+		successNum:    successNum,
+		failedNum:     failedNum,
+		avgSuccess:    avgSuccess,
+		tp50Success:   tp50Success,
+		tp90Success:   tp90Success,
+		successDetail: succ,
+	}
+	return summary
+}
+
+func replaceQueryTime(query *string, beginTime *string, endTime *string) {
+	*query = strings.Replace(*query, "{{begintime}}", *beginTime, -1)
+	*query = strings.Replace(*query, "{{endtime}}", *endTime, -1)
+}
+
+type QueryResult struct {
+	status  int
+	elapsed time.Duration
+}
+
+func ConcurrentQuery(db *sql.DB, query string, c chan QueryResult) {
+	start := time.Now()
+	// fmt.Println("executing query: ", query)
 	_, err := Query(db, query)
+	elapsed := time.Since(start)
 	if err != nil {
 		fmt.Println(err)
-		c <- 1
+		res := QueryResult{
+			status:  1,
+			elapsed: elapsed,
+		}
+		c <- res
 		return
 	}
-	c <- 0
+	res := QueryResult{
+		status:  0,
+		elapsed: elapsed,
+	}
+	c <- res
 }
 
 func Query(conn *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
