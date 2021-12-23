@@ -5,21 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4cdb47ca-23f0-4ddf-9658-c5b85a9aa360" name="Changes" comment="commit">
-      <change afterPath="$PROJECT_DIR$/goLearning/arrayTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/concurrentTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/loopTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/mapTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/operatorTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/pointerTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/structTest.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goLearning/varTest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/note.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/doc/note.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dp.go" beforeDir="false" afterPath="$PROJECT_DIR$/dp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functionTest.go" beforeDir="false" afterPath="$PROJECT_DIR$/goLearning/functionTest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hello.go" beforeDir="false" afterPath="$PROJECT_DIR$/hello.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interfaceTest.go" beforeDir="false" afterPath="$PROJECT_DIR$/goLearning/interfaceTest.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/learning.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/newPackage/packageTest.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +56,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="preferences.customizations" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
