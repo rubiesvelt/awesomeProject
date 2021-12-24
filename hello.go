@@ -14,15 +14,17 @@ import (
 )
 
 var (
-	ip          = flag.String("ip", "", "")
-	ips         = flag.String("ips", "", "")
-	port        = flag.Int("port", 9000, "")
-	user        = flag.String("user", "presto", "")
-	password    = flag.String("password", "qazpresto#2021", "")
-	concurrency = flag.Int("concurrency", 1, "")
-	singleQuery = flag.Bool("singleQuery", false, "")
-	beginTime   = flag.String("beginTime", "2021-11-14 00:00:00", "")
-	endTime     = flag.String("endTime", "2021-11-21 00:00:00", "")
+	ip             = flag.String("ip", "", "")
+	ips            = flag.String("ips", "", "")
+	port           = flag.Int("port", 9000, "")
+	user           = flag.String("user", "presto", "")
+	password       = flag.String("password", "qazpresto#2021", "")
+	concurrency    = flag.Int("concurrency", 1, "")
+	singleQuery    = flag.Bool("singleQuery", false, "")
+	minorBeginTime = flag.String("minorBeginTime", "", "") // minorTime 范围的，请求比例 1/6
+	minorEndTime   = flag.String("minorEndTime", "", "")
+	beginTime      = flag.String("beginTime", "2021-11-14 00:00:00", "")
+	endTime        = flag.String("endTime", "2021-11-21 00:00:00", "")
 
 	query = flag.String("q", "show databases", "")
 	sql1  = flag.String("q1", "", "")
@@ -42,11 +44,25 @@ func main() {
 	fmt.Println("user", *user)
 	fmt.Println("password", *password)
 	fmt.Println("concurrency", *concurrency)
+	fmt.Println("minorBeginTime", *minorBeginTime)
+	fmt.Println("minorEndTime", *minorEndTime)
 	fmt.Println("beginTime", *beginTime)
 	fmt.Println("endTime", *endTime)
 
 	sqls := []string{
 		*sql1, *sql2, *sql3, *sql4, *sql5, *sql6,
+	}
+
+	minorQueries := make([]string, 0)
+	for _, u := range sqls {
+		if u == "" {
+			continue
+		}
+		if *minorBeginTime != "" && *minorEndTime != "" {
+			replaceQueryTime(&u, minorBeginTime, minorEndTime)
+			minorQueries = append(minorQueries, u)
+			fmt.Println("minor sql: ", u)
+		}
 	}
 
 	queries := make([]string, 0)
@@ -63,7 +79,7 @@ func main() {
 
 	db, err := NewCHConnection(*port, *ip, *user, *password)
 	if err != nil {
-		fmt.Println("cluster connecte failed ", err)
+		fmt.Println("cluster connect failed ", err)
 		return
 	}
 	fmt.Println("cluster connected")
@@ -84,7 +100,19 @@ func main() {
 	c := make(chan QueryResult)
 
 	start := time.Now()
+
+	var minorQueriesCnt = 0
+	if len(minorQueries) > 0 {
+		minorQueriesCnt = *concurrency/6 + 1
+	}
+	fmt.Println("minorQueriesCnt", minorQueriesCnt)
 	for i := 0; i < *concurrency; i++ {
+		if minorQueriesCnt > 0 {
+			fmt.Println("minor query ", i, " started")
+			go ConcurrentQuery(db, minorQueries[i%len(minorQueries)], c)
+			minorQueriesCnt--
+			continue
+		}
 		fmt.Println("query ", i, " started")
 		go ConcurrentQuery(db, queries[i%len(queries)], c)
 	}
@@ -103,6 +131,8 @@ func main() {
 	fmt.Println("结束时间: ", *endTime)
 	fmt.Println("总计: ", summary.total, "成功: ", summary.successNum, "失败: ", summary.failedNum)
 	fmt.Println("耗时: ", elapsed)
+	fmt.Println("min: ", summary.min)
+	fmt.Println("max: ", summary.max)
 	fmt.Println("avg: ", summary.avgSuccess)
 	fmt.Println("tp50: ", summary.tp50Success)
 	fmt.Println("tp90: ", summary.tp90Success)
@@ -113,6 +143,8 @@ func main() {
 }
 
 type Summary struct {
+	min           int64
+	max           int64
 	total         int
 	successNum    int
 	failedNum     int
@@ -148,9 +180,11 @@ func makeSummary(res []QueryResult) Summary {
 	failedNum := len(fail)
 	avgSuccess := totalCost / int64(successNum)
 	tp50Success := succ[successNum/2]
-	tp90Success := succ[successNum*9/10]
+	tp90Success := succ[successNum*9/10-1]
 
 	summary := Summary{
+		min:           succ[0],
+		max:           succ[successNum-1],
 		total:         total,
 		successNum:    successNum,
 		failedNum:     failedNum,
