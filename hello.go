@@ -1,7 +1,6 @@
 package main
 
 import (
-	"awesomeProject/goLearning"
 	"fmt"
 	"sort"
 )
@@ -19,8 +18,6 @@ func main() {
 	sort.Ints(kkqq) // 结构体从小到大排序
 	fmt.Println("ok")
 
-	goLearning.SortTest()
-	goLearning.SetTest()
 }
 
 // 容器
@@ -68,7 +65,7 @@ func goodDaysToRobBank(security []int, time int) []int {
 输出：[-1,3,4]
 */
 func maxSubsequence(nums []int, k int) []int {
-	id := make([]int, len(nums))
+	id := make([]int, len(nums)) // 初始化有大小的 slice；var id []int 初始化空slice
 	for i := range id {
 		id[i] = i
 	}

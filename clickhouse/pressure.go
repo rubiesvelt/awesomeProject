@@ -53,7 +53,7 @@ func main() {
 		*sql1, *sql2, *sql3, *sql4, *sql5, *sql6,
 	}
 
-	minorQueries := make([]string, 0)
+	var minorQueries []string
 	for _, u := range sqls {
 		if u == "" {
 			continue
@@ -65,7 +65,7 @@ func main() {
 		}
 	}
 
-	queries := make([]string, 0)
+	var queries []string
 	for _, u := range sqls {
 		if u == "" {
 			continue
