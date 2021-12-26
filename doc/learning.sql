@@ -1,0 +1,1 @@
+select distinct(a.Score) as Score from Scores a order by a.Score desc
