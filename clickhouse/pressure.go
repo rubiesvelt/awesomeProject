@@ -240,12 +240,7 @@ func Query(conn *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
 	return rows, nil
 }
 
-func NewCHConnection(port int, ip, user, passwd string) (*sql.DB, error) {
-	var (
-		conn = &sql.DB{}
-		err  error
-	)
-
+func NewCHConnection(port int, ip, user, passwd string) (conn *sql.DB, err error) {
 	if len(user) > 0 && len(passwd) > 0 {
 		conn, err = sql.Open("clickhouse", "tcp://"+ip+":"+fmt.Sprint(port)+"?username="+user+"&password="+passwd+"&debug=false&read_timeout=30m")
 	} else {
@@ -262,11 +257,9 @@ func NewCHConnection(port int, ip, user, passwd string) (*sql.DB, error) {
 			glog.Errorf("Exception code: [%d], %s, %s", exception.Code, exception.Message, exception.StackTrace)
 			conn.Close()
 			return nil, err
-		} else {
-			glog.Errorf("%s", err)
 		}
-	} else {
-		glog.Infof("Ping %s successfuly", ip)
+		glog.Errorf("%s", err)
 	}
+	glog.Infof("Ping %s success", ip)
 	return conn, nil
 }
