@@ -1,6 +1,37 @@
 package goLearning
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
+
+func stringTest() {
+	s := "abc,def,gh"
+	var strs []string
+	// 以逗号分隔成数组
+	strs = strings.Split(s, ",")
+
+	// 判断是否包含子数组
+	b := strings.Contains(s, "abc")
+
+	// starts with
+	b = strings.HasPrefix("abcaaa", "abc")
+
+	// 拼接
+	s = "aa" + "bb" + "cc"
+
+	// utf-8 遍历
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		fmt.Println(ch)
+	}
+
+	// unicode 遍历
+	for _, ch1 := range s {
+		fmt.Println(ch1)
+	}
+	fmt.Println(strs, b)
+}
 
 // 类型转换 test
 func changeTest() {

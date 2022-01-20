@@ -1,24 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"sort"
 )
-
-func main() {
-	arr := []int{1, 2, 3, 8, 6, 5, 7}
-	sort.Ints(arr) // 数组从小到大排序
-
-	sli := make([]int, len(arr)) // 默认创出来都是 0
-
-	sli = append(sli, 9, 9, 9)
-	var kkqq []int
-	kkqq = sli
-
-	sort.Ints(kkqq) // 结构体从小到大排序
-	fmt.Println("ok")
-
-}
 
 // 容器
 // Map, Set, Stack, Queue, Deque, List

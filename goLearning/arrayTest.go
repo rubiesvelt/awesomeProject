@@ -59,4 +59,6 @@ func sliceTest() {
 	copy(slice1, slice)
 
 	fmt.Println(t, f, dp)
+
+	// go没有查找的方法
 }

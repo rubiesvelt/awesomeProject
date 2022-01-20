@@ -1,3 +1,15 @@
+## 系统表
+
+system.clusters 所有集群节点
+system.tables 所有集群表（包括本地表，分布式表）
+system.settings 系统设置表
+
+select * from system.settings where changed == 1
+
+
+
+
+
 ## 排序键，分区键，主键
 
 ```sh
@@ -34,6 +46,7 @@ ORDER BY expr
 # 2. 很长的数据范围（ index_granularity 的数倍）里 (a, b) 都是相同的值，并且这样的情况很普遍。换言之，就是加入另一列后，可以让您的查询略过很长的数据范围。
 # 3. 改善数据压缩；ClickHouse 以主键排序片段数据，所以，数据的一致性越高，压缩越好。
 # 4. 在 CollapsingMergeTree 和 SummingMergeTree 引擎里进行数据合并时会提供额外的处理逻辑。
+
 # 原因：
 # SummingMergeTree 和 AggregatingMergeTree 会对排序键相同的行进行聚合，
 # 所以 "把所有的维度" 放进 "排序键" 是很自然的做法。
@@ -141,5 +154,43 @@ e.g. 主键是 `(CounterID, Date)` 时，片段中数据首先按 `CounterID` �
         </test_cluster_1_repl>
     </ck_remote_servers>
 </yandex>
+```
+
+---
+
+### 分片键
+
+```sql
+# clickhouse 创库表示例
+
+# 集群名：hermesad-login
+
+# 需要创建以下库表
+# 数据库名：login_data
+# 表名：supply_history
+
+# 1. 创建数据库
+create database login_data on cluster `hermesad-login`;
+
+# 2. 创建local表
+CREATE TABLE login_data.supply_history_local on cluster `hermesad-login`
+(
+    `encrypt_id` String,
+    `game_app_id` String,
+    `event_time` String,
+    `mobile_plat` UInt8,
+    `imei` String,
+    `idfa` String,
+    `caid` String,
+    `oaid` String,
+    `suin` String
+)
+ENGINE = MergeTree
+ORDER BY encrypt_id
+
+# 3. 创建分布式表
+create table login_data.supply_history on cluster `hermesad-login`  as login_data.supply_history_smoba_test_local 
+Engine = Distributed("hermesad-login", "login_data", "supply_history_local", rand())  # rand()就是分片键，创建分布式表的时候需要指定分片键
+
 ```
 
