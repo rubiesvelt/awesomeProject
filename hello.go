@@ -1,8 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 )
+
+func main() {
+	s := "  ksalfj   "
+	s = strings.Trim(s, " ")
+	fmt.Println(s)
+}
 
 // 容器
 // Map, Set, Stack, Queue, Deque, List

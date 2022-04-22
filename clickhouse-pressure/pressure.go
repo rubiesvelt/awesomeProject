@@ -1,4 +1,4 @@
-package main
+package clickhouse_pressure
 
 import (
 	"database/sql"
@@ -242,9 +242,9 @@ func Query(conn *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
 
 func NewCHConnection(port int, ip, user, passwd string) (conn *sql.DB, err error) {
 	if len(user) > 0 && len(passwd) > 0 {
-		conn, err = sql.Open("clickhouse", "tcp://"+ip+":"+fmt.Sprint(port)+"?username="+user+"&password="+passwd+"&debug=false&read_timeout=30m")
+		conn, err = sql.Open("clickhouse-pressure", "tcp://"+ip+":"+fmt.Sprint(port)+"?username="+user+"&password="+passwd+"&debug=false&read_timeout=30m")
 	} else {
-		conn, err = sql.Open("clickhouse", "tcp://"+ip+":"+fmt.Sprint(port)+"?debug=false&read_timeout=30m")
+		conn, err = sql.Open("clickhouse-pressure", "tcp://"+ip+":"+fmt.Sprint(port)+"?debug=false&read_timeout=30m")
 	}
 	if err != nil {
 		glog.Errorf("Open connection to %s failed, error %s", ip, err)

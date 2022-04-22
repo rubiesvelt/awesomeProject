@@ -1,4 +1,4 @@
-package main
+package clickhouse_pressure
 
 import (
 	"bufio"
@@ -15,10 +15,6 @@ import (
 	"strings"
 	"time"
 )
-
-func main() {
-	LoadExporterMain()
-}
 
 func LoadExporterMain() {
 	http.Handle("/metrics", promhttp.Handler())
